@@ -22,7 +22,9 @@ import type { Book } from '@/types/book';
  * a cloud row must never write back over one.
  */
 
-const DEMO_URL = 'https://cdn.readest.com/books/the-great-gatsby.epub';
+// 必须是本 fork 书单里真实存在的 url —— `isDemoBook` 按书单判定，
+// 换掉预置书单（cdn.readest.com → public/books/）后老 url 已经不算演示书了
+const DEMO_URL = '/books/01-shikong.epub';
 
 const appService = vi.hoisted(() => ({
   saveLibraryBooks: vi.fn(async () => {}),

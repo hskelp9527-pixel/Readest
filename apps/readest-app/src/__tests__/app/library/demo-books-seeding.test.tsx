@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import type { Book } from '@/types/book';
@@ -66,6 +66,11 @@ beforeEach(() => {
       return { ok: true, status: 200, blob: async () => blob } as unknown as Response;
     }),
   );
+});
+
+// stubGlobal 不会自动还原：留着这个 fetch 会串到同一进程里的其他测试文件
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 const titles = () => useLibraryStore.getState().library.map((b) => b.title);
