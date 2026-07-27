@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import { MdLink, MdRssFeed } from 'react-icons/md';
-import { LuLibrary } from 'react-icons/lu';
 import { IoFileTray } from 'react-icons/io5';
-import { useEnv } from '@/context/EnvContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import MenuItem from '@/components/MenuItem';
 import Menu from '@/components/Menu';
@@ -13,6 +11,8 @@ export interface ImportMenuProps {
   onImportBooksFromFiles: () => void;
   onImportBooksFromDirectory?: () => void;
   onImportBookFromUrl?: () => void;
+  // The OPDS / Online Library row was removed from this fork; kept so
+  // LibraryHeader's call site is unchanged.
   onOpenCatalogManager: () => void;
   onOpenFeeds: () => void;
 }
@@ -23,11 +23,9 @@ const ImportMenu: React.FC<ImportMenuProps> = ({
   onImportBooksFromFiles,
   onImportBooksFromDirectory,
   onImportBookFromUrl,
-  onOpenCatalogManager,
   onOpenFeeds,
 }) => {
   const _ = useTranslation();
-  const { appService } = useEnv();
 
   const handleImportFromFiles = () => {
     onImportBooksFromFiles();
@@ -41,11 +39,6 @@ const ImportMenu: React.FC<ImportMenuProps> = ({
 
   const handleImportFromUrl = () => {
     onImportBookFromUrl?.();
-    setIsDropdownOpen?.(false);
-  };
-
-  const handleOpenCatalogManager = () => {
-    onOpenCatalogManager();
     setIsDropdownOpen?.(false);
   };
 
@@ -85,11 +78,6 @@ const ImportMenu: React.FC<ImportMenuProps> = ({
         label={_('From Feed URL')}
         Icon={<MdRssFeed className='h-5 w-5' />}
         onClick={handleOpenFeeds}
-      />
-      <MenuItem
-        label={appService?.isOnlineCatalogsAccessible ? _('Online Library') : _('OPDS Catalogs')}
-        Icon={<LuLibrary className='h-5 w-5' />}
-        onClick={handleOpenCatalogManager}
       />
     </Menu>
   );

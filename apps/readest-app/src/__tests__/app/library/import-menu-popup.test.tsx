@@ -45,7 +45,6 @@ describe('ImportMenuPopup', () => {
 
     expect(screen.getByRole('menuitem', { name: 'From Local File' })).toBeTruthy();
     expect(screen.getByRole('menuitem', { name: 'From Feed URL' })).toBeTruthy();
-    expect(screen.getByRole('menuitem', { name: 'Online Library' })).toBeTruthy();
     expect(screen.queryByRole('menuitem', { name: 'From Directory' })).toBeNull();
     expect(screen.queryByRole('menuitem', { name: 'From Web URL' })).toBeNull();
   });
@@ -63,11 +62,16 @@ describe('ImportMenuPopup', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('uses the OPDS label when curated online catalogs are unavailable', () => {
+  // The Online Library / OPDS Catalogs row was deliberately removed from this
+  // fork, so neither label should ever render.
+  it('never offers the online catalogs row', () => {
+    renderPopup();
+    expect(screen.queryByRole('menuitem', { name: 'Online Library' })).toBeNull();
+
+    cleanup();
     useEnvMock.mockReturnValue({ appService: { isOnlineCatalogsAccessible: false } });
     renderPopup();
-
-    expect(screen.getByRole('menuitem', { name: 'OPDS Catalogs' })).toBeTruthy();
+    expect(screen.queryByRole('menuitem', { name: 'OPDS Catalogs' })).toBeNull();
   });
 
   it('runs the selected action and dismisses the popup', () => {
