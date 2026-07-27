@@ -246,7 +246,7 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
 
   const iconSize = useResponsiveSize(18);
   const viewSettings = settings.globalViewSettings;
-  const demoBooks = useDemoBooks();
+  const seedingDemoBooks = useDemoBooks();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const handleScrollerRef = useCallback((el: HTMLDivElement | null) => {
     scrollRef.current = el;
@@ -733,23 +733,6 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
       setCurrentSeriesAuthorGroup(null);
     }
   }, [libraryBooks, searchParams, settings.libraryGroupBy]);
-
-  useEffect(() => {
-    if (demoBooks.length > 0 && libraryLoaded) {
-      const newLibrary = [...libraryBooks];
-      for (const book of demoBooks) {
-        const idx = newLibrary.findIndex((b) => b.hash === book.hash);
-        if (idx === -1) {
-          newLibrary.push(book);
-        } else {
-          newLibrary[idx] = book;
-        }
-      }
-      setLibrary(newLibrary);
-      appService?.saveLibraryBooks(newLibrary);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demoBooks, libraryLoaded]);
 
   const importBooks = async (
     files: SelectedFile[],
@@ -1645,6 +1628,11 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
                 handlePushLibrary={pushLibrary}
               />
             </div>
+          </div>
+        ) : seedingDemoBooks ? (
+          // 预置书还在下载：显示加载态而不是「开启你的书库」——书架本来就不该是空的
+          <div className='hero h-screen items-center justify-center'>
+            <Spinner loading />
           </div>
         ) : (
           <div className='hero drop-zone h-screen items-center justify-center'>

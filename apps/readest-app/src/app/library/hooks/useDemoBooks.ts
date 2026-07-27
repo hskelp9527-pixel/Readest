@@ -12,14 +12,28 @@ interface DemoBooks {
 }
 
 /**
- * 单本预置书的下载超时。最大的一本 7MB；超过这个时间说明连接已经不可用，
- * 交给下面那次重试比继续干等更划算。AbortSignal 也会掐断正在读的 body。
+ * 单本预置书的下载超时。最大的一本 7MB，实测跨境线路要 41s；超过这个时间说明连接
+ * 已经不可用，交给下面那次重试比继续干等更划算。AbortSignal 也会掐断正在读的 body。
  */
-const FETCH_TIMEOUT_MS = 60_000;
+const FETCH_TIMEOUT_MS = 120_000;
 
 /** 预置书单版本号：更换书单时递增，老用户也会自动换新版 */
 const PRESET_VERSION = 'v13-drop-pdf';
 const PRESET_FLAG = `presetBooksFetched.${PRESET_VERSION}`;
+/**
+ * 已成功上架的预置书 url → hash。整批没跑完时下次进来只补缺的那几本，不重下 22MB；
+ * 记 hash 是因为下面的清理要靠它认出「这是本版真书」——Book 行本身没有 url 字段。
+ */
+const PRESET_DONE = `presetBooksDone.${PRESET_VERSION}`;
+
+const readDone = (): Record<string, string> => {
+  try {
+    const v = JSON.parse(localStorage.getItem(PRESET_DONE) || '{}');
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+  } catch {
+    return {};
+  }
+};
 
 /** 上一版演示书（Readest 官方示例），播种新书单前清理掉 */
 const LEGACY_DEMO_URLS = [
@@ -80,9 +94,12 @@ export const findStaleBooks = (library: Book[], keepHashes: Set<string>): Book[]
       (PLACEHOLDER_TITLES.has(b.title.trim()) && !keepHashes.has(b.hash)),
   );
 
-export const useDemoBooks = () => {
+/** 返回「正在播种预置书」——书架页据此显示加载态，而不是「开启你的书库」空态 */
+export const useDemoBooks = (): boolean => {
   const { envConfig } = useEnv();
-  const [books, setBooks] = useState<Book[]>([]);
+  const [seeding, setSeeding] = useState(
+    () => typeof window !== 'undefined' && isWebAppPlatform() && !localStorage.getItem(PRESET_FLAG),
+  );
   const isLoading = useRef(false);
 
   useEffect(() => {
@@ -126,29 +143,50 @@ export const useDemoBooks = () => {
             throw e;
           }
         };
+        const done = readDone();
+        const pending = demoBooks.library.filter((url) => !done[url]);
+
+        // 每本导入完就立刻上架，不等整批 settle：9 本 22MB 在跨境线路上要一分钟，
+        // 等齐意味着这一分钟里书架是空的（正是「开启你的书库」那个空态）。
+        // 提交必须排队：updateBooks 内部 await saveLibraryBooks，并发调用会让先算出的
+        // 旧快照后落盘，把刚上架的书从 library.json 里抹掉。
+        let queue: Promise<unknown> = Promise.resolve();
+        const shelve = (book: Book, url: string) => {
+          queue = queue.then(async () => {
+            await useLibraryStore.getState().updateBooks(envConfig, [book]);
+            done[url] = book.hash;
+            localStorage.setItem(PRESET_DONE, JSON.stringify(done));
+          });
+          return queue;
+        };
+
         // 临时诊断：逐本记录导入结果到 window，便于定位单本失败拖垮整批的问题
-        const settled = await Promise.allSettled(demoBooks.library.map((url) => importOne(url)));
+        const settled = await Promise.allSettled(
+          pending.map(async (url) => {
+            const book = await importOne(url);
+            if (book) await shelve(book, url);
+            return book;
+          }),
+        );
         (window as unknown as { __presetImportReport?: string[] }).__presetImportReport =
           settled.map((r, i) =>
             r.status === 'fulfilled'
               ? r.value
                 ? `ok:${r.value.title}`
-                : `null:${demoBooks.library[i]}`
-              : `err:${demoBooks.library[i]}:${r.reason instanceof Error ? r.reason.message : String(r.reason)}`,
+                : `null:${pending[i]}`
+              : `err:${pending[i]}:${r.reason instanceof Error ? r.reason.message : String(r.reason)}`,
           );
         const books = settled
           .filter((r): r is PromiseFulfilledResult<Book | null> => r.status === 'fulfilled')
           .map((r) => r.value)
           .filter((book): book is Book => book !== null);
-        // 与「一键加入书架」同一持久化路径：合并进 store 并写 library.json，
-        // 不依赖书架页 useEffect 时序（墓碑条目按 hash 被新书覆盖即复活）
         if (books.length > 0) {
-          await useLibraryStore.getState().updateBooks(envConfig, books);
-
           // 导入完成后再清历史遗留：此时才知道哪些 hash 属于本版真书，
           // 同名的老占位书（《失控》《反脆弱》…）才能安全删掉。
           // 硬删除而不是打墓碑——墓碑正是上几版留下的脏数据。
-          const keepHashes = new Set(books.map((b) => b.hash));
+          // keepHashes 取 PRESET_DONE 全量而非本次导入：续跑那次只补几本，
+          // 之前几本同样是真书，只按本次导入判定会把它们当占位书误删。
+          const keepHashes = new Set(Object.values(done));
           const lib = useLibraryStore.getState().library;
           const stale = findStaleBooks(lib, keepHashes);
           if (stale.length > 0) {
@@ -158,24 +196,27 @@ export const useDemoBooks = () => {
             useLibraryStore.getState().setLibrary(cleaned);
             await appService.saveLibraryBooks(cleaned);
           }
-
-          // 只在确实导入成功后才标记：避免首次失败（dev 冷启动、文件暂不可达等）
-          // 时 flag 已被设上、之后再也不重试，导致书架永久空着显示登录引导
+        }
+        // 只在整单都上架后才收工：有失败的就不置位，下次进来靠 PRESET_DONE 只补缺的那几本
+        if (demoBooks.library.every((url) => done[url])) {
           localStorage.setItem(PRESET_FLAG, 'true');
         }
-        setBooks(books);
       } catch (error) {
         (window as unknown as { __presetError?: string }).__presetError = String(error);
         console.error('Failed to import demo books:', error);
+      } finally {
+        setSeeding(false);
       }
     };
 
     const presetFetchedFlag = localStorage.getItem(PRESET_FLAG);
     if (isWebAppPlatform() && !presetFetchedFlag) {
       fetchDemoBooks();
+    } else {
+      setSeeding(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return books;
+  return seeding;
 };
