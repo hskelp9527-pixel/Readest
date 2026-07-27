@@ -35,13 +35,23 @@ const getAdditionalBasicFontLinks = () => `
     .join('&')}&display=swap" crossorigin="anonymous">
 `;
 
+// storage.readest.com echoes `Access-Control-Allow-Origin` only for readest.com
+// origins, so on any other deployment these four stylesheets fail CORS and the
+// fonts silently disappear from the picker. The static Cloudflare build serves
+// them same-origin through `worker.ts`; the `url("./x.woff2")` references inside
+// each stylesheet are relative, so they follow the proxy prefix automatically.
+const READEST_FONT_BASE =
+  process.env['NEXT_PUBLIC_EXPORT_STATIC'] === 'true'
+    ? '/fonts/readest'
+    : 'https://storage.readest.com/public/font/dist';
+
 const getAdditionalCJKFontLinks = () => `
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans-webfont@1.0.4/misans-l3/misans-l3/result.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-web/1.520.0/lxgwwenkaigbscreen/result.css" crossorigin="anonymous" />
-  <link rel='stylesheet' href='https://storage.readest.com/public/font/dist/Huiwen-MinchoGBK/result.css' crossorigin="anonymous" />
-  <link rel='stylesheet' href='https://storage.readest.com/public/font/dist/KingHwa_OldSong/result.css' crossorigin="anonymous" />
-  <link rel='stylesheet' href='https://storage.readest.com/public/font/dist/Source%20Han%20Serif%20CN/result.css' crossorigin="anonymous" />
-  <link rel='stylesheet' href='https://storage.readest.com/public/font/dist/GuanKiapTsingKhai-T/result.css' crossorigin="anonymous" />
+  <link rel='stylesheet' href='${READEST_FONT_BASE}/Huiwen-MinchoGBK/result.css' crossorigin="anonymous" />
+  <link rel='stylesheet' href='${READEST_FONT_BASE}/KingHwa_OldSong/result.css' crossorigin="anonymous" />
+  <link rel='stylesheet' href='${READEST_FONT_BASE}/Source%20Han%20Serif%20CN/result.css' crossorigin="anonymous" />
+  <link rel='stylesheet' href='${READEST_FONT_BASE}/GuanKiapTsingKhai-T/result.css' crossorigin="anonymous" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${cjkGoogleFonts
     .map(
       ({ family, weights }) =>

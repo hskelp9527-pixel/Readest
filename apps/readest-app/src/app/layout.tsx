@@ -128,7 +128,13 @@ const devHmrPatchScript = `(${patchTauriHmrWebSocket.toString()})(${JSON.stringi
 // 'export'`), so the file isn't emitted — the request would return the SPA
 // fallback HTML and crash with `Unexpected token '<'`. All runtime-config
 // consumers fall back to `NEXT_PUBLIC_*` envs baked at build time on Tauri.
-const shouldInjectRuntimeConfig = process.env['NEXT_PUBLIC_APP_PLATFORM'] === 'web';
+//
+// The Cloudflare build (NEXT_PUBLIC_EXPORT_STATIC) is web *and* exported, and
+// `pageExtensions` drops `src/app/runtime-config.js` from it for the same
+// reason, so it has to be excluded here too or every page 404s on the script.
+const shouldInjectRuntimeConfig =
+  process.env['NEXT_PUBLIC_APP_PLATFORM'] === 'web' &&
+  process.env['NEXT_PUBLIC_EXPORT_STATIC'] !== 'true';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -2,7 +2,9 @@ import { Html, Head, Main, NextScript } from 'next/document';
 import Script from 'next/script';
 
 // Only the web/Docker build serves `/runtime-config.js`. See app/layout.tsx.
-const shouldInjectRuntimeConfig = process.env['NEXT_PUBLIC_APP_PLATFORM'] === 'web';
+const shouldInjectRuntimeConfig =
+  process.env['NEXT_PUBLIC_APP_PLATFORM'] === 'web' &&
+  process.env['NEXT_PUBLIC_EXPORT_STATIC'] !== 'true';
 
 export default function Document() {
   return (

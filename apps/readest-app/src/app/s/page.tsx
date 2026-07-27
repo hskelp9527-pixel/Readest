@@ -23,7 +23,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   // replaced at build time, so this early return DCEs the rest of the function
   // out of the Tauri bundle and the route becomes fully static. The web build
   // keeps the full dynamic implementation below.
-  if (process.env['NEXT_PUBLIC_APP_PLATFORM'] !== 'web') {
+  // NEXT_PUBLIC_EXPORT_STATIC is the Cloudflare static-export build: same `output: 'export'`
+  // constraint as Tauri, so it takes the static branch too. `ShareLanding` still
+  // reads the token client-side; only the rich unfurl metadata is lost.
+  if (
+    process.env['NEXT_PUBLIC_APP_PLATFORM'] !== 'web' ||
+    process.env['NEXT_PUBLIC_EXPORT_STATIC'] === 'true'
+  ) {
     return {
       title: 'Open in Readest',
       description: 'Open-source ebook reader for everyone, on every device.',

@@ -1,0 +1,35 @@
+diff --git a/dist/build/copyTracedFiles.js b/dist/build/copyTracedFiles.js
+index 9701b0401e987ee7cd696873af9d15b751580c52..b74c70544a0cb7318454f99e274d5247e4ab5357 100644
+--- a/dist/build/copyTracedFiles.js
++++ b/dist/build/copyTracedFiles.js
+@@ -225,7 +225,29 @@ File ${serverPath} does not exist
+         }
+         if (symlink) {
+             try {
+-                symlinkSync(symlink, to);
++                // On Windows an untyped symlink pointing at a directory is created as a
++                // *file* symlink, which Win32 refuses to enumerate (ACCESS_DENIED) and
++                // esbuild reports as "Cannot read directory". pnpm's node_modules links
++                // are directories, so create junctions for them. Junctions need an
++                // absolute target, resolved against the link's own directory.
++                // `statSync(from)` is not usable here: the standalone output Next
++                // wrote has the same broken link type, so stat'ing through it fails
++                // with EPERM. Stat the resolved target instead.
++                let linkIsDir = false;
++                if (process.platform === "win32") {
++                    try {
++                        linkIsDir = statSync(path.resolve(path.dirname(from), symlink)).isDirectory();
++                    }
++                    catch {
++                        // dangling link - fall through to the plain symlink
++                    }
++                }
++                if (linkIsDir) {
++                    symlinkSync(path.resolve(path.dirname(to), symlink), to, "junction");
++                }
++                else {
++                    symlinkSync(symlink, to);
++                }
+             }
+             catch (e) {
+                 if (e.code !== "EEXIST") {

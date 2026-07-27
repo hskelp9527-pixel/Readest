@@ -1,27 +1,19 @@
-name = "readest-web"
-main = ".open-next/worker.js"
+name = "readest-airainyu"
+main = "worker.ts"
 compatibility_date = "2026-04-10"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 preview_urls = true
 
 [[routes]]
-pattern = "web-cf.readest.com"
-zone_name = "readest.com"
-custom_domain = true
-
-[[routes]]
-pattern = "api-cf.readest.com"
-zone_name = "readest.com"
-custom_domain = true
-
-[[routes]]
-pattern = "web.readest.com"
-zone_name = "readest.com"
+pattern = "readest.airainyu.xyz"
+zone_name = "airainyu.xyz"
 custom_domain = true
 
 [vars]
 PNPM_VERSION = "10.28.1"
+# Z-Library 镜像；凭据走 secret：wrangler secret put ZLIB_REMIX_USERID / ZLIB_REMIX_USERKEY
+ZLIB_DOMAIN = "tw.zlib0.ru"
 
 [observability]
 enabled = true
@@ -30,20 +22,11 @@ logs = { head_sampling_rate = 0.01 }
 traces = { head_sampling_rate = 0.01 }
 
 [assets]
-directory = ".open-next/assets"
+# 静态导出产物（EXPORT_STATIC=true next build）。走 Static Assets 而不是
+# OpenNext 的服务端 bundle：后者 gzip 后 6.5 MiB，超过免费版 3 MiB 的代码上限。
+directory = "out"
 binding = "ASSETS"
+not_found_handling = "404-page"
 
-[[kv_namespaces]]
-binding = "TRANSLATIONS_KV"
-id = "fa6e3eb1988a424bbf3c952e01650ced"
-
-[[r2_buckets]]
-binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "readest-next-inc-cache"
-
-# Per-event metrics for the App Store / Google Play subscription webhooks and the
-# reconciliation sweep. 100% capture, independent of the head-sampled Workers
-# Logs above. Queryable via the Analytics Engine SQL API.
-[[analytics_engine_datasets]]
-binding = "IAP_WEBHOOK_AE"
-dataset = "iap_webhooks"
+# 上游的 KV / R2 / Analytics Engine 绑定指向 Readest 官方账号的资源，本账号没有。
+# 代码里这三个绑定都是可选的（翻译缓存、增量缓存、IAP 埋点），去掉即可正常运行。

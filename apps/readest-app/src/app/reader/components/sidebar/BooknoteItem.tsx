@@ -60,7 +60,7 @@ const BooknoteItem: React.FC<BooknoteItemProps> = ({ bookKey, item, isNearest, o
   // marked.parse is heavy when called on every list scroll re-render across
   // hundreds of items. Cache by note text — note edits change item.note and
   // bust the cache automatically.
-  const noteHtml = useMemo(() => (note ? marked.parse(note) : ''), [note]);
+  const noteHtml = useMemo(() => (note ? marked.parse(note, { async: false }) : ''), [note]);
 
   // dayjs().fromNow() reformats every render; cache per createdAt.
   const createdAtLabel = useMemo(() => dayjs(item.createdAt).fromNow(), [item.createdAt]);

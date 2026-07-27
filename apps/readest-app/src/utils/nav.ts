@@ -97,7 +97,15 @@ export const navigateToReader = (
   navOptions?: { scroll?: boolean },
 ) => {
   const ids = bookIds.join(BOOK_IDS_SEPARATOR);
-  if (isWebAppPlatform() && !isPWA()) {
+  // `/reader/<ids>` is a pages-router route that only resolves through the
+  // `rewrites()` in next.config. The static Cloudflare build has no rewrites, and
+  // the app router can't resolve the path either — it fetches
+  // `/reader/<ids>/__next._index.txt`, 404s, and falls back to a full page
+  // reload. Use the app router's own `/reader?ids=` there; `ReaderContent` reads
+  // either shape. Deep links to `/reader/<ids>` still work via worker.ts.
+  const canUseReaderPath =
+    isWebAppPlatform() && !isPWA() && process.env['NEXT_PUBLIC_EXPORT_STATIC'] !== 'true';
+  if (canUseReaderPath) {
     router.push(`/reader/${ids}${queryParams ? `?${queryParams}` : ''}`, navOptions);
   } else {
     const params = new URLSearchParams(queryParams || '');
