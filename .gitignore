@@ -54,3 +54,8 @@ result*
 .claude/worktrees
 .claude/settings.local.json
 
+# 版权书源文件与预置书生成过程的临时产物，不提交
+/book/
+/.tmp-preset/
+/.tmp-presetdev-run.log
+

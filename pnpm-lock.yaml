@@ -47,6 +47,7 @@ overrides:
 patchedDependencies:
   '@ai-sdk/provider-utils@3.0.25': 4611a356f4bb4e6f1196858719f8cb03947a41850257ee0527b0ec03f927dd6d
   '@ai-sdk/provider-utils@4.0.27': 168f9924f516aa1264359fc6b3520c6aaba761842888ccd504660fc30ee96d6f
+  '@opennextjs/aws@4.0.2': bfcf0e1593ecee4327a2c29293eaf152b71c813f5e49c2d19daf556c32ef7d82
   mdast-util-gfm-autolink-literal@2.0.1: a119b196bac546b8f07e1a9600ced6f526b0676e2b959914868e393ecffbaff8
 
 importers:
@@ -347,6 +348,9 @@ importers:
       nunjucks:
         specifier: ^3.2.4
         version: 3.2.4(chokidar@3.6.0)
+      opencc-js:
+        specifier: ^1.4.1
+        version: 1.4.1
       overlayscrollbars:
         specifier: ^2.11.4
         version: 2.16.0
@@ -3474,18 +3478,6 @@ packages:
     resolution: {integrity: sha512-UQ1Obj+BSZqE8zSfCvnNn3VLGu4ECGGIfkbF9v13+h/HeZr8JroTXdk0Y8WAGvb7m/hyvjEk+gU+1L0ydkKxWQ==}
     cpu: [arm64]
     os: [darwin]
-
-  '@tursodatabase/database-linux-arm64-gnu@0.6.0-pre.28':
-    resolution: {integrity: sha512-a5OkedE0AissAbjocvDCsmcQc4gtnVWpwbcbeJ6EoC3oJApK4AzX6vzCl8W4oA7k4cn/V9U4L1QGjWZlLcjePg==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@tursodatabase/database-linux-x64-gnu@0.6.0-pre.28':
-    resolution: {integrity: sha512-raEgDNNUxZn2jKX0jV6XEozyWt+3wnazstPLx+YhCU3vSGEui4xnD/ehulCRPCKbybOAFLpmeLvkolc29KFLww==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
 
   '@tursodatabase/database-win32-x64-msvc@0.6.0-pre.28':
     resolution: {integrity: sha512-BrGP+LtkvDR5hxb8a98ltQ9KZgLSn/njLEvDIL/D7OJY811EVcKVtw6dgVDXoQccv3w/NfEGP8MB4kHC4A3dIA==}
@@ -6801,6 +6793,9 @@ packages:
 
   oniguruma-to-es@4.3.6:
     resolution: {integrity: sha512-csuQ9x3Yr0cEIs/Zgx/OEt9iBw9vqIunAPQkx19R/fiMq2oGVTgcMqO/V3Ybqefr1TBvosI6jU539ksaBULJyA==}
+
+  opencc-js@1.4.1:
+    resolution: {integrity: sha512-2lPLcrg7cnh1ATSduOxhnk/jq6KlR6w+5Ihl4wF7Z5e5Rva4vxTyugV5rZ7EiUCOZl+EDOLetIix+BhgYDCC+A==}
 
   opener@1.5.2:
     resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
@@ -10585,7 +10580,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@opennextjs/aws@4.0.2(next@16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(@types/node@22.19.19)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))':
+  '@opennextjs/aws@4.0.2(patch_hash=bfcf0e1593ecee4327a2c29293eaf152b71c813f5e49c2d19daf556c32ef7d82)(next@16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(@types/node@22.19.19)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))':
     dependencies:
       '@ast-grep/napi': 0.40.5
       '@aws-sdk/client-cloudfront': 3.984.0
@@ -10613,7 +10608,7 @@ snapshots:
     dependencies:
       '@ast-grep/napi': 0.40.5
       '@dotenvx/dotenvx': 1.31.0
-      '@opennextjs/aws': 4.0.2(next@16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(@types/node@22.19.19)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))
+      '@opennextjs/aws': 4.0.2(patch_hash=bfcf0e1593ecee4327a2c29293eaf152b71c813f5e49c2d19daf556c32ef7d82)(next@16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(@types/node@22.19.19)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))
       ci-info: 4.4.0
       cloudflare: 4.5.0
       comment-json: 4.6.2
@@ -11919,12 +11914,6 @@ snapshots:
   '@tursodatabase/database-darwin-arm64@0.6.0-pre.28':
     optional: true
 
-  '@tursodatabase/database-linux-arm64-gnu@0.6.0-pre.28':
-    optional: true
-
-  '@tursodatabase/database-linux-x64-gnu@0.6.0-pre.28':
-    optional: true
-
   '@tursodatabase/database-win32-x64-msvc@0.6.0-pre.28':
     optional: true
 
@@ -11933,8 +11922,6 @@ snapshots:
       '@tursodatabase/database-common': 0.6.0-pre.30
     optionalDependencies:
       '@tursodatabase/database-darwin-arm64': 0.6.0-pre.28
-      '@tursodatabase/database-linux-arm64-gnu': 0.6.0-pre.28
-      '@tursodatabase/database-linux-x64-gnu': 0.6.0-pre.28
       '@tursodatabase/database-win32-x64-msvc': 0.6.0-pre.28
 
   '@tybys/wasm-util@0.10.2':
@@ -15864,6 +15851,8 @@ snapshots:
       oniguruma-parser: 0.12.2
       regex: 6.1.0
       regex-recursion: 6.0.2
+
+  opencc-js@1.4.1: {}
 
   opener@1.5.2: {}
 

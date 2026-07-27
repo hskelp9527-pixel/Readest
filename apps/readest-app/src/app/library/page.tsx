@@ -88,6 +88,7 @@ import { useDragDropImport } from './hooks/useDragDropImport';
 import { useTransferQueue } from '@/hooks/useTransferQueue';
 import { useAppRouter } from '@/hooks/useAppRouter';
 import { Toast } from '@/components/Toast';
+import MobileTabBar from '@/components/MobileTabBar';
 import {
   createBookGroups,
   ensureLibraryGroupByType,
@@ -1758,6 +1759,7 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
         onClose={() => setShowImportFromUrl(false)}
         onSubmit={handleImportBookFromUrl}
       />
+      <MobileTabBar />
       <Toast />
     </div>
   );
