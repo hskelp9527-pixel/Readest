@@ -61,6 +61,7 @@
 - [fastlane App Store](fastlane-apple-appstore-submission.md) `APPLE_API_KEY_PATH` out of build env
 - [Turbopack cache OOM (#4619)](turbopack-build-cache-oom-docker-standalone.md) · [pdfjs vendor wasm](pdfjs-vendor-wasm-decoders.md) copy `wasm/*`
 - [CF Worker 64 MiB deploy fail](cf-worker-64mb-turbopack-regression.md) silent turbopack; split build + stubs
+- [CF free-plan static export deploy](cf-free-plan-static-export-deploy.md) 3 MiB cap → `out/` + tiny `worker.ts`; Windows file-type symlinks break esbuild
 - [Deps override workflow](deps-security-overrides-workflow.md) `pnpm-workspace.yaml`
 - [pnpm version mismatch](pnpm-version-mismatch-lockfile-churn.md) use `npx pnpm@11.1.1`
 - [Xcode 26.2 broke iOS builds](xcode26-swiftrs-ios-build-broken.md) vendored `packages/swift-rs`
