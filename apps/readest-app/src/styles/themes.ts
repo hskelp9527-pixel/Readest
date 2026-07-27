@@ -118,6 +118,15 @@ const _ = (stubKey: string) => stubKey;
 
 export const themes = [
   {
+    // 本项目默认主题：暖阳（温暖书房基调）
+    name: 'warm',
+    label: _('Warm Sunshine'),
+    colors: {
+      light: generateLightPalette({ fg: '#3E3833', bg: '#F7F3EC', primary: '#D97757' }),
+      dark: generateDarkPalette({ fg: '#E8E0D4', bg: '#1B1815', primary: '#E08A6C' }),
+    },
+  },
+  {
     name: 'default',
     label: _('Default'),
     colors: {

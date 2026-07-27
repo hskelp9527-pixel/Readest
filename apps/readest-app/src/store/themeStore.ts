@@ -53,10 +53,10 @@ const getInitialThemeMode = (): ThemeMode => {
 
 const getInitialThemeColor = (): string => {
   if (typeof window !== 'undefined' && localStorage) {
-    const defaultColor = window.__READEST_IS_EINK ? 'contrast' : 'default';
+    const defaultColor = window.__READEST_IS_EINK ? 'contrast' : 'warm';
     return localStorage.getItem('themeColor') || defaultColor;
   }
-  return 'default';
+  return 'warm';
 };
 
 export const useThemeStore = create<ThemeState>((set, get) => {
