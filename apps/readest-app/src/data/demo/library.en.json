@@ -1,10 +1,13 @@
 {
   "library": [
-    "https://cdn.readest.com/books/a-room-of-one-s-own.epub",
-    "https://cdn.readest.com/books/hamlet.epub",
-    "https://cdn.readest.com/books/meditations.epub",
-    "https://cdn.readest.com/books/the-great-gatsby.epub",
-    "https://cdn.readest.com/books/the-scarlet-letter.epub",
-    "https://cdn.readest.com/books/this-side-of-paradise.epub"
+    "/books/01-shikong.epub",
+    "/books/03-xitongzhimei.epub",
+    "/books/04-shishi.epub",
+    "/books/05-lijiumeijie.epub",
+    "/books/06-fancuiruo.epub",
+    "/books/07-yishengdelvcheng.epub",
+    "/books/08-qianmianyingxiong.epub",
+    "/books/09-diyizhexue.epub",
+    "/books/10-maozedongxuanji.epub"
   ]
 }

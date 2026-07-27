@@ -17,4 +17,13 @@ const demoBookUrls = new Set([...libraryEn.library, ...libraryZh.library]);
  * a cloud row must never be merged back over one. Identifying them by url also
  * covers rows imported before this rule existed.
  */
-export const isDemoBook = (book: Book): boolean => !!book.url && demoBookUrls.has(book.url);
+export const isDemoBook = (book: Book): boolean => {
+  if (!book.url) return false;
+  if (demoBookUrls.has(book.url)) return true;
+  // 预置书在配置中为相对路径（/books/...），导入后记录为绝对 URL，按路径部分匹配
+  try {
+    return demoBookUrls.has(new URL(book.url).pathname);
+  } catch {
+    return false;
+  }
+};

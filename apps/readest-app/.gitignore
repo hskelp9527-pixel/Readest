@@ -65,6 +65,9 @@ src-tauri/tauri.*.local.json
 # vendor
 /public/vendor
 
+# 预置书 epub（占位书 + 公版书 + 可能由部署者放入的版权书），不提交
+/public/books/
+
 # docs
 docs/superpowers
 
