@@ -76,6 +76,8 @@ A 404 immediately after `wrangler deploy` can just be propagation: the assets la
 
 Run the console check one line at a time — pasting several lines only prints the last expression's value, which is how `__presetImportReport` got mistaken for `undefined` once.
 
+**A shelf that is empty for the first minute is not the same bug.** The nine epubs total 22 MB and measured 6–41s each on a cross-border link, so waiting for the whole batch before shelving anything meant a full minute of the "Open Your Library" import prompt — which is what an anonymous visitor reads as "the shelf is broken". Each import now commits on its own (queued, because `updateBooks` awaits `saveLibraryBooks` and concurrent callers can land a stale snapshot last), and `presetBooksDone.<version>` maps url → hash so a partial run resumes instead of re-downloading 22 MB. `PRESET_FLAG` is only set once the whole list is on the shelf.
+
 ## `/s` export blocker
 
 `/s` (share landing) blocked the export with `dynamic = "error"` + `await searchParams` in `generateMetadata`. Its existing guard keyed on `NEXT_PUBLIC_APP_PLATFORM !== 'web'`; extended to also take the static branch when `EXPORT_STATIC === 'true'`. Only the rich unfurl metadata is lost — `ShareLanding` reads the token client-side.
