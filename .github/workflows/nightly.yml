@@ -91,7 +91,7 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: setup pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
 
       - name: setup node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
@@ -101,7 +101,7 @@ jobs:
 
       - name: setup Java (for Android build only)
         if: matrix.config.release == 'android'
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -125,7 +125,7 @@ jobs:
         with:
           targets: ${{ matrix.config.rust_target }}
 
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      - uses: Swatinem/rust-cache@a45951ff880207c249adf57334cf2e9bd81d6e1e # v2
         with:
           key: nightly-${{ matrix.config.os }}-${{ matrix.config.release }}-${{ matrix.config.arch }}-cargo
 
@@ -422,7 +422,7 @@ jobs:
       # download.readest.com rather than a GitHub release. The .sig updater
       # signatures are excluded — they are not binaries users run.
       - name: attest nightly binaries
-        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
             nightly-out/Readest*
