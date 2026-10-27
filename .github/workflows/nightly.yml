@@ -24,6 +24,9 @@ concurrency:
 
 jobs:
   compute-version:
+    # Nightly signs and uploads releases, which needs upstream's signing keys and
+    # R2 bucket. Forks skip it unless they opt in with the ENABLE_NIGHTLY variable.
+    if: ${{ github.repository == 'readest/readest' || vars.ENABLE_NIGHTLY == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       nightly_version: ${{ steps.v.outputs.nightly_version }}
@@ -440,7 +443,7 @@ jobs:
 
   assemble-manifest:
     needs: [compute-version, build]
-    if: ${{ always() && needs.build.result != 'cancelled' }}
+    if: ${{ always() && needs.compute-version.result == 'success' && needs.build.result != 'cancelled' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
